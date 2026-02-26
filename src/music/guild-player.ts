@@ -106,7 +106,7 @@ export class GuildPlayer {
 
     // --- Message Anchor ---
 
-    async sendOrUpdatePlayerMessage(channelId?: string): Promise<void> {
+    async sendOrUpdatePlayerMessage(channelId?: string, forceNew = false): Promise<void> {
         if (this.isUpdating) return;
         this.isUpdating = true;
 
@@ -125,6 +125,17 @@ export class GuildPlayer {
                     ? buildCompactPlayerView(state)
                     : buildFullPlayerView(state))
                 : buildIdlePlayerView(this.guildId);
+
+            // forceNew: delete old message and send a fresh one
+            if (forceNew && this.playerMessageId) {
+                try {
+                    const old = await channel.messages.fetch(this.playerMessageId);
+                    await old.delete();
+                } catch {
+                    // Already deleted, ignore
+                }
+                this.playerMessageId = null;
+            }
 
             if (this.playerMessageId) {
                 try {

@@ -46,7 +46,7 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
     }
     guildPlayer.textChannelId = interaction.channelId;
 
-    await guildPlayer.sendOrUpdatePlayerMessage(interaction.channelId);
+    await guildPlayer.sendOrUpdatePlayerMessage(interaction.channelId, true);
 
     await interaction.editReply({content: 'プレイヤーを起動しました。'});
 }
