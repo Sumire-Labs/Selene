@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment / secrets
+.env
+config.yaml
+
+# Logs
+*.log
+
+# Lavalink plugins (downloaded at runtime)
+lavalink/plugins/
+
+# Prisma
+prisma/migrations/**/migration_lock.toml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

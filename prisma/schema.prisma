@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id        String   @id // Discord guild snowflake
+  prefix    String   @default("/")
+  djRoleId  String?  @map("dj_role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("guilds")
+}
+
+model BotSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("bot_settings")
+}
+
+model Counter {
+  id        Int          @id @default(autoincrement())
+  guildId   String       @map("guild_id")
+  word      String
+  matchType Int          @map("match_type") // 1=partial, 2=exact, 3=word
+  createdAt DateTime     @default(now()) @map("created_at")
+  logs      CounterLog[]
+
+  @@unique([guildId, word])
+  @@index([guildId])
+  @@map("counters")
+}
+
+model CounterLog {
+  id        Int      @id @default(autoincrement())
+  counterId Int      @map("counter_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  counter   Counter  @relation(fields: [counterId], references: [id], onDelete: Cascade)
+
+  @@index([counterId, createdAt])
+  @@index([counterId, userId])
+  @@map("counter_logs")
+}
+
+model TicketConfig {
+  guildId        String   @id @map("guild_id")
+  panelChannelId String   @map("panel_channel_id")
+  categoryId     String   @map("category_id")
+  supportRoleId  String   @map("support_role_id")
+  panelMessageId String?  @map("panel_message_id")
+  ticketCounter  Int      @default(0) @map("ticket_counter")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("ticket_configs")
+}

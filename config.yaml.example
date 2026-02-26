@@ -1,0 +1,21 @@
+bot:
+  token: "YOUR_BOT_TOKEN"
+  clientId: "YOUR_CLIENT_ID"
+  guildId: "YOUR_GUILD_ID"  # Optional: for dev guild-scoped deploys
+  databaseUrl: "postgresql://selene:selene@postgres:5432/selene"  # Docker: postgres, Local: localhost
+
+lavalink:
+  nodes:
+    - name: "main"
+      url: "lavalink:2333"       # Docker: service name, Local: localhost:2333
+      auth: "youshallnotpass"
+      secure: false
+
+music:
+  defaultVolume: 80
+  maxQueueSize: 200
+  idleTimeoutMs: 60000
+  playerUpdateIntervalMs: 15000
+
+xgd:
+  apiKey: "YOUR_XGD_API_KEY"

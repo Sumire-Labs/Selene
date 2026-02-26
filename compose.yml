@@ -1,0 +1,62 @@
+services:
+  selene:
+    build: .
+    container_name: selene
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql://selene:selene@postgres:5432/selene"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    depends_on:
+      lavalink:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - selene
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: selene-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: selene
+      POSTGRES_PASSWORD: selene
+      POSTGRES_DB: selene
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U selene
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - selene
+
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:e141cd9
+    container_name: lavalink
+    restart: unless-stopped
+    environment:
+      - _JAVA_OPTIONS=-Xmx1G
+    volumes:
+      - ./lavalink/application.yml:/opt/Lavalink/application.yml:ro
+      - ./lavalink/plugins:/opt/Lavalink/plugins
+    ports:
+      - "2333:2333"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "--header=Authorization: youshallnotpass", "http://localhost:2333/version" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - selene
+
+volumes:
+  pgdata:
+
+networks:
+  selene:
+    name: selene
