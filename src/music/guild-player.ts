@@ -124,33 +124,18 @@ export class GuildPlayer {
                 ? (this.viewMode === 'compact'
                     ? buildCompactPlayerView(state)
                     : buildFullPlayerView(state))
-                : buildIdlePlayerView();
+                : buildIdlePlayerView(this.guildId);
 
-            // Check if current message is the latest in the channel
             if (this.playerMessageId) {
                 try {
-                    const messages = await channel.messages.fetch({limit: 1});
-                    const latestMessage = messages.first();
-
-                    if (latestMessage?.id === this.playerMessageId) {
-                        // Still at bottom — edit in place
-                        const msg = await channel.messages.fetch(this.playerMessageId);
-                        await msg.edit({
-                            components: [container],
-                            flags: MessageFlags.IsComponentsV2,
-                        });
-                        return;
-                    }
-
-                    // Not at bottom — delete old message
-                    try {
-                        const old = await channel.messages.fetch(this.playerMessageId);
-                        await old.delete();
-                    } catch {
-                        // Already deleted, ignore
-                    }
+                    const msg = await channel.messages.fetch(this.playerMessageId);
+                    await msg.edit({
+                        components: [container],
+                        flags: MessageFlags.IsComponentsV2,
+                    });
+                    return;
                 } catch {
-                    // Message fetch failed, send new one
+                    // Message was deleted or fetch failed — fall through to send new one
                 }
             }
 
