@@ -62,3 +62,18 @@ model TicketConfig {
 
   @@map("ticket_configs")
 }
+
+model LoggerConfig {
+  guildId             String   @id @map("guild_id")
+  enabled             Boolean  @default(false)
+  defaultChannelId    String?  @map("default_channel_id")
+  messageChannelId    String?  @map("message_channel_id")
+  memberChannelId     String?  @map("member_channel_id")
+  moderationChannelId String?  @map("moderation_channel_id")
+  serverChannelId     String?  @map("server_channel_id")
+  enabledEvents       String[] @map("enabled_events")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("logger_configs")
+}

@@ -9,6 +9,7 @@ import {wirePlayerEvents} from './music/player-events.js';
 import {musicManager} from './music/music-manager.js';
 import {handleCounterMessage} from './counter/counter-listener.js';
 import {handleEmbedFixMessage} from './embedfix/embedfix-listener.js';
+import {wireLoggerEvents} from './settings/logger-listener.js';
 import {logger} from './utils/logger.js';
 
 const require = createRequire(import.meta.url);
@@ -44,6 +45,9 @@ export function createClient(): Client {
             GatewayIntentBits.GuildVoiceStates,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.MessageContent,
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildModeration,
+            GatewayIntentBits.GuildWebhooks,
         ],
     });
 
@@ -66,6 +70,7 @@ export function createClient(): Client {
     );
 
     wirePlayerEvents(kazagumo);
+    wireLoggerEvents(client);
 
     // Shoukaku node events
     kazagumo.shoukaku.on('ready', (name) => {

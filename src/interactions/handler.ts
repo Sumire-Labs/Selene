@@ -8,6 +8,7 @@ import {logger} from '../utils/logger.js';
 
 const buttonHandlers = new Map<string, (interaction: never) => Promise<void>>();
 const modalHandlers = new Map<string, (interaction: never) => Promise<void>>();
+const selectMenuHandlers = new Map<string, (interaction: never) => Promise<void>>();
 
 export function registerButtonHandler(
     prefix: string,
@@ -21,6 +22,13 @@ export function registerModalHandler(
     handler: (interaction: never) => Promise<void>,
 ): void {
     modalHandlers.set(prefix, handler);
+}
+
+export function registerSelectMenuHandler(
+    prefix: string,
+    handler: (interaction: never) => Promise<void>,
+): void {
+    selectMenuHandlers.set(prefix, handler);
 }
 
 export async function handleInteraction(interaction: Interaction): Promise<void> {
@@ -57,6 +65,18 @@ export async function handleInteraction(interaction: Interaction): Promise<void>
                 await handler(interaction as never);
             } else {
                 logger.warn(`Unknown button prefix: ${prefix}`);
+            }
+            return;
+        }
+
+        if (interaction.isAnySelectMenu()) {
+            const customId = interaction.customId;
+            const prefix = customId.split(':')[0];
+            const handler = selectMenuHandlers.get(prefix);
+            if (handler) {
+                await handler(interaction as never);
+            } else {
+                logger.warn(`Unknown select menu prefix: ${prefix}`);
             }
             return;
         }

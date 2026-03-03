@@ -16,3 +16,6 @@ export const MATCH_TYPE_WORD = 3;
 
 // Ticket
 export const TICKET_CHANNEL_PREFIX = 'ticket';
+
+// Logger
+export const MAX_LOG_CONTENT_LENGTH = 1000;

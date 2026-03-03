@@ -17,5 +17,7 @@ export const SeleneTheme = {
         error: '⚠️ エラー ⚠️',
         embedfix: 'ツイート埋め込み',
         ticket: 'チケットサポート',
+        settings: 'サーバー設定',
+        logger: 'ロガー設定',
     },
 } as const;
