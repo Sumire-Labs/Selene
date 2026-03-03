@@ -29,9 +29,31 @@ async function handleTicketCreateModal(interaction: ModalSubmitInteraction): Pro
     await interaction.deferReply({flags: MessageFlags.Ephemeral});
 
     const config = await getTicketConfig(guildId);
-    if (!config) {
+    if (!config || !config.categoryId || !config.supportRoleId) {
         await interaction.editReply({content: 'チケットシステムが設定されていません。'});
         return;
+    }
+
+    // Check max tickets per user
+    if (config.maxTicketsPerUser > 0 && config.categoryId) {
+        const guild = interaction.guild!;
+        const category = guild.channels.cache.get(config.categoryId);
+        if (category && 'children' in category) {
+            let userTicketCount = 0;
+            for (const [, channel] of category.children.cache) {
+                if (!channel.name.startsWith('ticket-')) continue;
+                const perms = channel.permissionOverwrites.cache.get(interaction.user.id);
+                if (perms?.allow.has(PermissionFlagsBits.ViewChannel)) {
+                    userTicketCount++;
+                }
+            }
+            if (userTicketCount >= config.maxTicketsPerUser) {
+                await interaction.editReply({
+                    content: `チケットの上限（${config.maxTicketsPerUser}件）に達しています。`,
+                });
+                return;
+            }
+        }
     }
 
     const counter = await incrementTicketCounter(guildId);

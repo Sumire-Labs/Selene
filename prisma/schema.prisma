@@ -51,14 +51,18 @@ model CounterLog {
 }
 
 model TicketConfig {
-  guildId        String   @id @map("guild_id")
-  panelChannelId String   @map("panel_channel_id")
-  categoryId     String   @map("category_id")
-  supportRoleId  String   @map("support_role_id")
-  panelMessageId String?  @map("panel_message_id")
-  ticketCounter  Int      @default(0) @map("ticket_counter")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  guildId           String   @id @map("guild_id")
+  panelChannelId    String?  @map("panel_channel_id")
+  categoryId        String?  @map("category_id")
+  supportRoleId     String?  @map("support_role_id")
+  panelMessageId    String?  @map("panel_message_id")
+  ticketCounter     Int      @default(0) @map("ticket_counter")
+  panelTitle        String?  @map("panel_title")
+  panelDescription  String?  @map("panel_description")
+  maxTicketsPerUser Int      @default(1) @map("max_tickets_per_user")
+  autoCloseHours    Int?     @map("auto_close_hours")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("ticket_configs")
 }

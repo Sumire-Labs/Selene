@@ -2,6 +2,7 @@ import {
     type AnySelectMenuInteraction,
     type ChannelSelectMenuInteraction,
     MessageFlags,
+    type RoleSelectMenuInteraction,
     type StringSelectMenuInteraction,
 } from 'discord.js';
 import {registerSelectMenuHandler} from '../handler.js';
@@ -11,8 +12,18 @@ import {
     setDefaultChannel,
     updateEnabledEvents,
 } from '../../settings/logger-service.js';
+import {
+    getTicketConfig,
+    updateAutoCloseHours,
+    updateCategory,
+    updateMaxTicketsPerUser,
+    updatePanelChannel,
+    updateSupportRole,
+} from '../../ticket/ticket-service.js';
 import {buildLoggerEventsView} from '../../ui/builders/settings/logger-events.builder.js';
 import {buildLoggerChannelsView} from '../../ui/builders/settings/logger-channels.builder.js';
+import {buildTicketSetupView} from '../../ui/builders/settings/ticket-setup.builder.js';
+import {buildTicketAdvancedView} from '../../ui/builders/settings/ticket-advanced.builder.js';
 import {CATEGORY_EVENTS, type LogEventCategoryType} from '../../settings/types.js';
 import {logger} from '../../utils/logger.js';
 
@@ -30,13 +41,13 @@ async function handleSettingsSelect(interaction: AnySelectMenuInteraction): Prom
     await interaction.deferUpdate();
 
     switch (action) {
-        // Event selection within a category
+        // --- Logger selects ---
+
         case 'log-evsel': {
             if (!param) return;
             const category = param as LogEventCategoryType;
             const selectedEvents = (interaction as StringSelectMenuInteraction).values;
 
-            // Merge: keep events from other categories, replace this category's events
             const config = await getLoggerConfig(guildId);
             if (!config) return;
 
@@ -54,7 +65,6 @@ async function handleSettingsSelect(interaction: AnySelectMenuInteraction): Prom
             break;
         }
 
-        // Default channel selection
         case 'log-chdef': {
             const channelId = (interaction as ChannelSelectMenuInteraction).values[0];
             if (!channelId) return;
@@ -64,13 +74,11 @@ async function handleSettingsSelect(interaction: AnySelectMenuInteraction): Prom
 
             const config = await getLoggerConfig(guildId);
             if (!config) return;
-            // Re-render with first category tab active
             const view = buildLoggerChannelsView(guildId, config, param as LogEventCategoryType ?? 'MESSAGE');
             await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
             break;
         }
 
-        // Category channel override
         case 'log-chcat': {
             if (!param) return;
             const category = param as LogEventCategoryType;
@@ -83,6 +91,79 @@ async function handleSettingsSelect(interaction: AnySelectMenuInteraction): Prom
             const config = await getLoggerConfig(guildId);
             if (!config) return;
             const view = buildLoggerChannelsView(guildId, config, category);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        // --- Ticket selects ---
+
+        case 'ticket-ch': {
+            const channelId = (interaction as ChannelSelectMenuInteraction).values[0];
+            if (!channelId) return;
+
+            const result = await updatePanelChannel(guildId, channelId);
+            if (!result.ok) return;
+
+            const config = await getTicketConfig(guildId);
+            if (!config) return;
+            const view = buildTicketSetupView(guildId, config);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'ticket-cat': {
+            const channelId = (interaction as ChannelSelectMenuInteraction).values[0];
+            if (!channelId) return;
+
+            const result = await updateCategory(guildId, channelId);
+            if (!result.ok) return;
+
+            const config = await getTicketConfig(guildId);
+            if (!config) return;
+            const view = buildTicketSetupView(guildId, config);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'ticket-role': {
+            const roleId = (interaction as RoleSelectMenuInteraction).values[0];
+            if (!roleId) return;
+
+            const result = await updateSupportRole(guildId, roleId);
+            if (!result.ok) return;
+
+            const config = await getTicketConfig(guildId);
+            if (!config) return;
+            const view = buildTicketSetupView(guildId, config);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'ticket-max': {
+            const value = (interaction as StringSelectMenuInteraction).values[0];
+            if (value === undefined) return;
+
+            const result = await updateMaxTicketsPerUser(guildId, Number(value));
+            if (!result.ok) return;
+
+            const config = await getTicketConfig(guildId);
+            if (!config) return;
+            const view = buildTicketAdvancedView(guildId, config);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'ticket-aclose': {
+            const value = (interaction as StringSelectMenuInteraction).values[0];
+            if (value === undefined) return;
+
+            const hours = Number(value) || null; // 0 → null (disabled)
+            const result = await updateAutoCloseHours(guildId, hours);
+            if (!result.ok) return;
+
+            const config = await getTicketConfig(guildId);
+            if (!config) return;
+            const view = buildTicketAdvancedView(guildId, config);
             await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
             break;
         }

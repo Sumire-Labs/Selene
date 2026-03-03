@@ -16,6 +16,10 @@ export const MATCH_TYPE_WORD = 3;
 
 // Ticket
 export const TICKET_CHANNEL_PREFIX = 'ticket';
+export const TICKET_DEFAULT_TITLE = 'チケットサポート';
+export const TICKET_DEFAULT_DESCRIPTION =
+    'サポートが必要な場合は、下のボタンからチケットを作成してください。\nスタッフが対応いたします。';
+export const TICKET_AUTO_CLOSE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
 
 // Logger
 export const MAX_LOG_CONTENT_LENGTH = 1000;

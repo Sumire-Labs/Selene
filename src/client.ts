@@ -125,7 +125,8 @@ export function createClient(): Client {
     return client;
 }
 
-export async function startBot(): Promise<void> {
+export async function startBot(): Promise<Client> {
     const client = createClient();
     await client.login(config.discordToken);
+    return client;
 }

@@ -1,14 +1,16 @@
 import {ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder} from 'discord.js';
 import {SeleneTheme} from '../../themes/selene.theme.js';
 import {createContainer, createDivider, createHeader, createText} from '../base.builder.js';
+import {TICKET_DEFAULT_TITLE, TICKET_DEFAULT_DESCRIPTION} from '../../../config/constants.js';
 
-export function buildTicketPanelView(): ContainerBuilder {
+export function buildTicketPanelView(title?: string, description?: string): ContainerBuilder {
+    const displayTitle = title || TICKET_DEFAULT_TITLE;
+    const displayDescription = description || TICKET_DEFAULT_DESCRIPTION;
+
     return createContainer(SeleneTheme.colors.purple)
-        .addTextDisplayComponents(createHeader(`🎫 ${SeleneTheme.prefixes.ticket}`))
+        .addTextDisplayComponents(createHeader(`🎫 ${displayTitle}`))
         .addSeparatorComponents(createDivider())
-        .addTextDisplayComponents(
-            createText('サポートが必要な場合は、下のボタンからチケットを作成してください。\nスタッフが対応いたします。'),
-        )
+        .addTextDisplayComponents(createText(displayDescription))
         .addSeparatorComponents(createDivider())
         .addActionRowComponents(
             new ActionRowBuilder<ButtonBuilder>().addComponents(

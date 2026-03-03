@@ -24,7 +24,6 @@ async function loadModules(): Promise<void> {
     await import('./interactions/buttons/counter.buttons.js');
 
     // Ticket
-    await import('./commands/general/ticket.command.js');
     await import('./interactions/buttons/ticket.buttons.js');
     await import('./interactions/modals/ticket-create.modal.js');
 
@@ -32,13 +31,14 @@ async function loadModules(): Promise<void> {
     await import('./commands/general/settings.command.js');
     await import('./interactions/buttons/settings.buttons.js');
     await import('./interactions/selects/settings.selects.js');
+    await import('./interactions/modals/settings-ticket.modal.js');
 }
 
 async function main(): Promise<void> {
     logger.info('Starting Selene...');
     await loadModules();
-    await startBot();
-    startScheduler();
+    const client = await startBot();
+    startScheduler(client);
 }
 
 main().catch((error) => {
