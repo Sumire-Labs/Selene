@@ -7,8 +7,8 @@ import {
     TextInputStyle,
 } from 'discord.js';
 import {registerButtonHandler} from '../handler.js';
-import {ensureLoggerConfig, getLoggerConfig, setCategoryChannel, toggleLogger} from '../../settings/logger-service.js';
-import {ensureTicketConfig, getTicketConfig, updatePanelMessageId} from '../../ticket/ticket-service.js';
+import {getLoggerConfig, setCategoryChannel, toggleLogger} from '../../settings/logger-service.js';
+import {getTicketConfig, updatePanelMessageId} from '../../ticket/ticket-service.js';
 import {buildSettingsDashboard} from '../../ui/builders/settings/dashboard.builder.js';
 import {buildLoggerOverview} from '../../ui/builders/settings/logger-overview.builder.js';
 import {buildLoggerEventsView} from '../../ui/builders/settings/logger-events.builder.js';
@@ -65,28 +65,6 @@ async function handleSettingsButton(interaction: ButtonInteraction): Promise<voi
     await interaction.deferUpdate();
 
     switch (action) {
-        // Dashboard → category detail
-        case 'cat': {
-            if (param === 'logger') {
-                const result = await ensureLoggerConfig(guildId);
-                if (!result.ok) {
-                    await interaction.editReply({content: result.reason});
-                    return;
-                }
-                const view = buildLoggerOverview(guildId, result.config);
-                await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
-            } else if (param === 'ticket') {
-                const result = await ensureTicketConfig(guildId);
-                if (!result.ok) {
-                    await interaction.editReply({content: result.reason});
-                    return;
-                }
-                const view = buildTicketOverview(guildId, result.config);
-                await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
-            }
-            break;
-        }
-
         // Back to dashboard
         case 'back': {
             const dashboard = buildSettingsDashboard(guildId);

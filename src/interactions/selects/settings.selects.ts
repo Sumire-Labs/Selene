@@ -7,12 +7,14 @@ import {
 } from 'discord.js';
 import {registerSelectMenuHandler} from '../handler.js';
 import {
+    ensureLoggerConfig,
     getLoggerConfig,
     setCategoryChannel,
     setDefaultChannel,
     updateEnabledEvents,
 } from '../../settings/logger-service.js';
 import {
+    ensureTicketConfig,
     getTicketConfig,
     updateAutoCloseHours,
     updateCategory,
@@ -20,8 +22,10 @@ import {
     updatePanelChannel,
     updateSupportRole,
 } from '../../ticket/ticket-service.js';
+import {buildLoggerOverview} from '../../ui/builders/settings/logger-overview.builder.js';
 import {buildLoggerEventsView} from '../../ui/builders/settings/logger-events.builder.js';
 import {buildLoggerChannelsView} from '../../ui/builders/settings/logger-channels.builder.js';
+import {buildTicketOverview} from '../../ui/builders/settings/ticket-overview.builder.js';
 import {buildTicketSetupView} from '../../ui/builders/settings/ticket-setup.builder.js';
 import {buildTicketAdvancedView} from '../../ui/builders/settings/ticket-advanced.builder.js';
 import {CATEGORY_EVENTS, type LogEventCategoryType} from '../../settings/types.js';
@@ -41,6 +45,29 @@ async function handleSettingsSelect(interaction: AnySelectMenuInteraction): Prom
     await interaction.deferUpdate();
 
     switch (action) {
+        // Dashboard category select
+        case 'cat': {
+            const selected = (interaction as StringSelectMenuInteraction).values[0];
+            if (selected === 'logger') {
+                const result = await ensureLoggerConfig(guildId);
+                if (!result.ok) {
+                    await interaction.editReply({content: result.reason});
+                    return;
+                }
+                const view = buildLoggerOverview(guildId, result.config);
+                await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            } else if (selected === 'ticket') {
+                const result = await ensureTicketConfig(guildId);
+                if (!result.ok) {
+                    await interaction.editReply({content: result.reason});
+                    return;
+                }
+                const view = buildTicketOverview(guildId, result.config);
+                await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            }
+            break;
+        }
+
         // --- Logger selects ---
 
         case 'log-evsel': {
