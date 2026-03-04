@@ -9,6 +9,8 @@ import {wirePlayerEvents} from './music/player-events.js';
 import {musicManager} from './music/music-manager.js';
 import {handleCounterMessage} from './counter/counter-listener.js';
 import {handleEmbedFixMessage} from './embedfix/embedfix-listener.js';
+import {handleXpMessage} from './xp/xp-listener.js';
+import {handleVoiceStateForXp, startVoiceXpTicker} from './xp/xp-voice-tracker.js';
 import {wireLoggerEvents} from './settings/logger-listener.js';
 import {logger} from './utils/logger.js';
 
@@ -95,6 +97,13 @@ export function createClient(): Client {
     client.on(Events.InteractionCreate, handleInteraction);
     client.on(Events.MessageCreate, handleCounterMessage);
     client.on(Events.MessageCreate, handleEmbedFixMessage);
+    client.on(Events.MessageCreate, handleXpMessage);
+    client.on(Events.VoiceStateUpdate, handleVoiceStateForXp);
+
+    // Start voice XP ticker once ready
+    client.once(Events.ClientReady, () => {
+        startVoiceXpTicker(client);
+    });
 
     // VC empty detection: auto-disconnect after timeout
     client.on(Events.VoiceStateUpdate, (oldState, _newState) => {

@@ -127,4 +127,5 @@ export interface SettingsCategory {
 export const SETTINGS_CATEGORIES: SettingsCategory[] = [
     {id: 'logger', label: 'ロガー', emoji: '📋'},
     {id: 'ticket', label: 'チケット', emoji: '🎫'},
+    {id: 'xp', label: '経験値', emoji: '📈'},
 ];

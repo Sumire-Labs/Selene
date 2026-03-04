@@ -9,6 +9,7 @@ import {
 import {registerButtonHandler} from '../handler.js';
 import {getLoggerConfig, setCategoryChannel, toggleLogger} from '../../settings/logger-service.js';
 import {getTicketConfig, updatePanelMessageId} from '../../ticket/ticket-service.js';
+import {getXpConfig, toggleXp, getRoleRewards, getUserXp} from '../../xp/xp-service.js';
 import {buildSettingsDashboard} from '../../ui/builders/settings/dashboard.builder.js';
 import {buildLoggerOverview} from '../../ui/builders/settings/logger-overview.builder.js';
 import {buildLoggerEventsView} from '../../ui/builders/settings/logger-events.builder.js';
@@ -17,6 +18,11 @@ import {buildTicketOverview} from '../../ui/builders/settings/ticket-overview.bu
 import {buildTicketSetupView} from '../../ui/builders/settings/ticket-setup.builder.js';
 import {buildTicketAdvancedView} from '../../ui/builders/settings/ticket-advanced.builder.js';
 import {buildTicketPanelView} from '../../ui/builders/ticket/panel.builder.js';
+import {buildXpOverview} from '../../ui/builders/settings/xp-overview.builder.js';
+import {buildXpBasicView} from '../../ui/builders/settings/xp-basic.builder.js';
+import {buildXpNotificationView} from '../../ui/builders/settings/xp-notification.builder.js';
+import {buildXpRewardsView} from '../../ui/builders/settings/xp-rewards.builder.js';
+import {buildXpUsersView} from '../../ui/builders/settings/xp-users.builder.js';
 import {LogEventCategory, type LogEventCategoryType} from '../../settings/types.js';
 import {TICKET_DEFAULT_TITLE, TICKET_DEFAULT_DESCRIPTION} from '../../config/constants.js';
 import {logger} from '../../utils/logger.js';
@@ -29,6 +35,49 @@ async function handleSettingsButton(interaction: ButtonInteraction): Promise<voi
 
     if (!guildId) {
         logger.warn('Settings button missing guildId', {customId: interaction.customId});
+        return;
+    }
+
+    // xp-rwadd shows a modal for level input
+    if (action === 'xp-rwadd') {
+        const modal = new ModalBuilder()
+            .setCustomId(`settings-xprw:${guildId}`)
+            .setTitle('ロール報酬の追加')
+            .addComponents(
+                new ActionRowBuilder<TextInputBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('level')
+                        .setLabel('レベル (1〜100)')
+                        .setStyle(TextInputStyle.Short)
+                        .setMaxLength(3)
+                        .setRequired(true),
+                ),
+            );
+        await interaction.showModal(modal);
+        return;
+    }
+
+    // xp-uedit shows a modal for XP editing
+    if (action === 'xp-uedit') {
+        const userId = param;
+        if (!userId) return;
+
+        const userData = await getUserXp(guildId, userId);
+        const modal = new ModalBuilder()
+            .setCustomId(`settings-xpue:${guildId}:${userId}`)
+            .setTitle('ユーザーXP編集')
+            .addComponents(
+                new ActionRowBuilder<TextInputBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('xp')
+                        .setLabel('XP値')
+                        .setStyle(TextInputStyle.Short)
+                        .setMaxLength(10)
+                        .setValue(String(userData?.xp ?? 0))
+                        .setRequired(true),
+                ),
+            );
+        await interaction.showModal(modal);
         return;
     }
 
@@ -214,6 +263,60 @@ async function handleSettingsButton(interaction: ButtonInteraction): Promise<voi
             const config = await getTicketConfig(guildId);
             if (!config) return;
             const view = buildTicketOverview(guildId, config);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        // --- XP actions ---
+
+        case 'xp-toggle': {
+            const toggleResult = await toggleXp(guildId);
+            if (!toggleResult.ok) {
+                await interaction.editReply({content: toggleResult.reason});
+                return;
+            }
+            const xpConfig = await getXpConfig(guildId);
+            if (!xpConfig) return;
+            const rewards = await getRoleRewards(guildId);
+            const view = buildXpOverview(guildId, xpConfig, rewards.length);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'xp-basic': {
+            const xpConfig = await getXpConfig(guildId);
+            if (!xpConfig) return;
+            const view = buildXpBasicView(guildId, xpConfig);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'xp-notif': {
+            const xpConfig = await getXpConfig(guildId);
+            if (!xpConfig) return;
+            const view = buildXpNotificationView(guildId, xpConfig);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'xp-rewards': {
+            const rewards = await getRoleRewards(guildId);
+            const view = buildXpRewardsView(guildId, rewards);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'xp-users': {
+            const view = buildXpUsersView(guildId);
+            await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            break;
+        }
+
+        case 'xp-back': {
+            const xpConfig = await getXpConfig(guildId);
+            if (!xpConfig) return;
+            const rewards = await getRoleRewards(guildId);
+            const view = buildXpOverview(guildId, xpConfig, rewards.length);
             await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
             break;
         }

@@ -23,3 +23,7 @@ export const TICKET_AUTO_CLOSE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
 
 // Logger
 export const MAX_LOG_CONTENT_LENGTH = 1000;
+
+// XP
+export const XP_VOICE_TICK_INTERVAL_MS = 60_000;
+export const MAX_XP_ROLE_REWARDS = 25;

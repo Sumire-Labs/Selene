@@ -19,5 +19,8 @@ export const SeleneTheme = {
         ticket: 'チケットサポート',
         settings: 'サーバー設定',
         logger: 'ロガー設定',
+        xp: '経験値設定',
+        profile: 'プロフィール',
+        levelup: 'レベルアップ',
     },
 } as const;

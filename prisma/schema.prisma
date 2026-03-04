@@ -81,3 +81,47 @@ model LoggerConfig {
 
   @@map("logger_configs")
 }
+
+model XpConfig {
+  guildId               String         @id @map("guild_id")
+  enabled               Boolean        @default(false)
+  multiplier            Float          @default(1.0)
+  messageXp             Int            @default(20) @map("message_xp")
+  voiceXpPerMinute      Int            @default(6) @map("voice_xp_per_minute")
+  cooldownSeconds       Int            @default(60) @map("cooldown_seconds")
+  notificationMode      String         @default("same") @map("notification_mode")
+  notificationChannelId String?        @map("notification_channel_id")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+  roleRewards           XpRoleReward[]
+
+  @@map("xp_configs")
+}
+
+model UserXp {
+  id                Int      @id @default(autoincrement())
+  guildId           String   @map("guild_id")
+  userId            String   @map("user_id")
+  xp                Int      @default(0)
+  level             Int      @default(0)
+  totalMessages     Int      @default(0) @map("total_messages")
+  totalVoiceMinutes Int      @default(0) @map("total_voice_minutes")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([guildId, userId])
+  @@index([guildId, xp(sort: Desc)])
+  @@map("user_xp")
+}
+
+model XpRoleReward {
+  id      Int      @id @default(autoincrement())
+  guildId String   @map("guild_id")
+  level   Int
+  roleId  String   @map("role_id")
+  config  XpConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, level])
+  @@index([guildId])
+  @@map("xp_role_rewards")
+}

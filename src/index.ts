@@ -7,6 +7,7 @@ async function loadModules(): Promise<void> {
     await import('./commands/general/ping.command.js');
     await import('./commands/general/avatar.command.js');
     await import('./commands/general/short.command.js');
+    await import('./commands/general/profile.command.js');
 
     // Music commands
     await import('./commands/music/play.command.js');
@@ -32,6 +33,7 @@ async function loadModules(): Promise<void> {
     await import('./interactions/buttons/settings.buttons.js');
     await import('./interactions/selects/settings.selects.js');
     await import('./interactions/modals/settings-ticket.modal.js');
+    await import('./interactions/modals/settings-xp.modal.js');
 }
 
 async function main(): Promise<void> {
