@@ -128,4 +128,5 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
     {id: 'logger', label: 'ロガー', emoji: '📋'},
     {id: 'ticket', label: 'チケット', emoji: '🎫'},
     {id: 'xp', label: '経験値', emoji: '📈'},
+    {id: 'embedfix', label: '埋め込み修正', emoji: '🔗'},
 ];

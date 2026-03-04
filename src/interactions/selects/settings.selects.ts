@@ -23,6 +23,7 @@ import {
     updatePanelChannel,
     updateSupportRole,
 } from '../../ticket/ticket-service.js';
+import {ensureEmbedFixConfig} from '../../settings/embedfix-service.js';
 import {
     ensureXpConfig,
     getXpConfig,
@@ -50,6 +51,7 @@ import {buildXpBasicView} from '../../ui/builders/settings/xp-basic.builder.js';
 import {buildXpNotificationView} from '../../ui/builders/settings/xp-notification.builder.js';
 import {buildXpRewardsView} from '../../ui/builders/settings/xp-rewards.builder.js';
 import {buildXpUsersView} from '../../ui/builders/settings/xp-users.builder.js';
+import {buildEmbedFixOverview} from '../../ui/builders/settings/embedfix-overview.builder.js';
 import {CATEGORY_EVENTS, type LogEventCategoryType} from '../../settings/types.js';
 import {logger} from '../../utils/logger.js';
 
@@ -94,6 +96,14 @@ async function handleSettingsSelect(interaction: AnySelectMenuInteraction): Prom
                 }
                 const rewards = await getRoleRewards(guildId);
                 const view = buildXpOverview(guildId, result.config, rewards.length);
+                await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
+            } else if (selected === 'embedfix') {
+                const result = await ensureEmbedFixConfig(guildId);
+                if (!result.ok) {
+                    await interaction.editReply({content: result.reason});
+                    return;
+                }
+                const view = buildEmbedFixOverview(guildId, result.config);
                 await interaction.editReply({components: [view], flags: MessageFlags.IsComponentsV2});
             }
             break;

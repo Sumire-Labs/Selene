@@ -125,3 +125,12 @@ model XpRoleReward {
   @@index([guildId])
   @@map("xp_role_rewards")
 }
+
+model EmbedFixConfig {
+  guildId   String   @id @map("guild_id")
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("embedfix_configs")
+}

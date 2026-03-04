@@ -1,12 +1,16 @@
 import {type Message, MessageFlags} from 'discord.js';
 import {downloadVideo, fetchTweet} from './embedfix-service.js';
 import {buildTweetView} from '../ui/builders/embedfix/tweet.builder.js';
+import {getCachedEmbedFixConfig} from '../settings/embedfix-cache.js';
 
 const TWITTER_URL_RE = /https?:\/\/(?:www\.)?(?:x\.com|twitter\.com)\/(\w+)\/status\/(\d+)\S*/gi;
 
 export async function handleEmbedFixMessage(message: Message): Promise<void> {
     if (message.author.bot) return;
     if (!message.guildId) return;
+
+    const efConfig = await getCachedEmbedFixConfig(message.guildId);
+    if (efConfig && !efConfig.enabled) return;
 
     const content = message.content;
     if (!content) return;
