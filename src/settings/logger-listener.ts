@@ -53,6 +53,7 @@ async function sendLog(
         await channel.send({
             components: [buildFn()],
             flags: MessageFlags.IsComponentsV2,
+            allowedMentions: {parse: []},
         });
     } catch (error) {
         logger.error('Failed to send log', error, {guildId, event});
