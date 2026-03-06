@@ -65,7 +65,7 @@ export function buildTweetView(tweet: FxTweet, videoBuffer?: Buffer | null): Twe
         .addSeparatorComponents(createDivider())
         .addTextDisplayComponents(
             createText(
-                `♡ ${formatCompactNumber(tweet.likes)}  🔁 ${formatCompactNumber(tweet.retweets)}  👁 ${formatCompactNumber(tweet.views)}`,
+                `♡ ${formatCompactNumber(tweet.likes)}  ↻ ${formatCompactNumber(tweet.retweets)}  ▷ ${formatCompactNumber(tweet.views)}`,
             ),
         );
 

@@ -40,7 +40,7 @@ export function buildRedditView(post: RedditPostData): ContainerBuilder {
         .addSeparatorComponents(createDivider())
         .addTextDisplayComponents(
             createText(
-                `⬆ ${formatCompactNumber(post.score)} (${ratio}%)  💬 ${formatCompactNumber(post.num_comments)}`,
+                `↑ ${formatCompactNumber(post.score)} (${ratio}%)  ○ ${formatCompactNumber(post.num_comments)}`,
             ),
         );
 

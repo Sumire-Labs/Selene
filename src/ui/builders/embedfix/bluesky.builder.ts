@@ -50,7 +50,7 @@ export function buildBlueskyView(post: BskyPost, originalUrl: string): Container
         .addSeparatorComponents(createDivider())
         .addTextDisplayComponents(
             createText(
-                `♡ ${formatCompactNumber(post.likeCount)}  🔁 ${formatCompactNumber(post.repostCount)}  💬 ${formatCompactNumber(post.replyCount)}`,
+                `♡ ${formatCompactNumber(post.likeCount)}  ↻ ${formatCompactNumber(post.repostCount)}  ○ ${formatCompactNumber(post.replyCount)}`,
             ),
         );
 

@@ -57,7 +57,7 @@ export function buildTikTokView(data: TikWmData, originalUrl: string, videoBuffe
         .addSeparatorComponents(createDivider())
         .addTextDisplayComponents(
             createText(
-                `♡ ${formatCompactNumber(data.digg_count)}  💬 ${formatCompactNumber(data.comment_count)}  🔁 ${formatCompactNumber(data.share_count)}  ▶ ${formatCompactNumber(data.play_count)}`,
+                `♡ ${formatCompactNumber(data.digg_count)}  ○ ${formatCompactNumber(data.comment_count)}  ↻ ${formatCompactNumber(data.share_count)}  ▷ ${formatCompactNumber(data.play_count)}`,
             ),
         );
 
