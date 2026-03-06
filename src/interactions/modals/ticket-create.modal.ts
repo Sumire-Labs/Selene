@@ -102,9 +102,10 @@ async function handleTicketCreateModal(interaction: ModalSubmitInteraction): Pro
         ],
     });
 
+    await ticketChannel.send({content: `<@${userId}> <@&${config.supportRoleId}>`});
+
     const welcomeView = buildTicketWelcomeView(userId, title, description);
     await ticketChannel.send({
-        content: `<@${userId}> <@&${config.supportRoleId}>`,
         components: [welcomeView],
         flags: MessageFlags.IsComponentsV2,
     });
