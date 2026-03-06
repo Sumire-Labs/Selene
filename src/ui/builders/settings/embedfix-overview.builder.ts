@@ -16,7 +16,7 @@ export function buildEmbedFixOverview(guildId: string, config: EmbedFixConfig): 
     container.addTextDisplayComponents(
         createText(
             `**ステータス:** ${statusIcon} ${statusText}\n\n` +
-            `Twitter/Xのリンクを検出し、埋め込みプレビューを自動表示します。`,
+            `Twitter/X・Instagram・TikTok・Bluesky・Redditのリンクを検出し、埋め込みプレビューを自動表示します。`,
         ),
     );
     container.addSeparatorComponents(createDivider());

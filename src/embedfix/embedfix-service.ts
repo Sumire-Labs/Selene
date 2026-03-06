@@ -1,23 +1,6 @@
 import {logger} from '../utils/logger.js';
-import type {FxTweet, FxTweetResponse} from './types.js';
 
 const VIDEO_SIZE_LIMIT = 25 * 1024 * 1024; // 25 MB (Discord upload limit)
-
-export async function fetchTweet(screenName: string, statusId: string): Promise<FxTweet | null> {
-    const url = `https://api.fxtwitter.com/${screenName}/status/${statusId}`;
-    try {
-        const res = await fetch(url);
-        if (!res.ok) {
-            logger.warn('fxtwitter API returned non-OK status', {status: res.status, screenName, statusId});
-            return null;
-        }
-        const data = (await res.json()) as FxTweetResponse;
-        return data.tweet ?? null;
-    } catch (err) {
-        logger.error('Failed to fetch tweet from fxtwitter', err, {screenName, statusId});
-        return null;
-    }
-}
 
 export async function downloadVideo(videoUrl: string): Promise<Buffer | null> {
     try {

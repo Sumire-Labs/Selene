@@ -12,34 +12,31 @@ import {
 import {SeleneTheme} from '../../themes/selene.theme.js';
 import {createContainer, createDivider, createHeader, createText} from '../base.builder.js';
 import {formatCompactNumber} from '../../../utils/formatters.js';
-import type {FxTweet} from '../../../embedfix/twitter-types.js';
+import type {TikWmData} from '../../../embedfix/tiktok-types.js';
 
-export interface TweetViewResult {
+export interface TikTokViewResult {
     container: ContainerBuilder;
     files: AttachmentBuilder[];
 }
 
-export function buildTweetView(tweet: FxTweet, videoBuffer?: Buffer | null): TweetViewResult {
+export function buildTikTokView(data: TikWmData, originalUrl: string, videoBuffer?: Buffer | null): TikTokViewResult {
     const files: AttachmentBuilder[] = [];
 
-    const container = createContainer(SeleneTheme.colors.twitter)
-        .addTextDisplayComponents(createHeader(SeleneTheme.prefixes.embedfix))
+    const container = createContainer(SeleneTheme.colors.tiktok)
+        .addTextDisplayComponents(createHeader(SeleneTheme.prefixes.tiktok))
         .addSectionComponents(
             new SectionBuilder()
                 .addTextDisplayComponents(
-                    createText(`**${tweet.author.name}** @${tweet.author.screen_name}`),
+                    createText(`**${data.author.nickname}** @${data.author.unique_id}`),
                 )
                 .setThumbnailAccessory(
-                    new ThumbnailBuilder().setURL(tweet.author.avatar_url),
+                    new ThumbnailBuilder().setURL(data.author.avatar),
                 ),
         )
         .addSeparatorComponents(createDivider())
-        .addTextDisplayComponents(createText(tweet.text));
+        .addTextDisplayComponents(createText(data.title));
 
-    const hasVideo = tweet.media?.videos && tweet.media.videos.length > 0;
-
-    if (hasVideo && videoBuffer) {
-        // Embed video inline via MediaGallery + attachment
+    if (videoBuffer) {
         const filename = 'video.mp4';
         files.push(new AttachmentBuilder(videoBuffer, {name: filename}));
         container.addMediaGalleryComponents(
@@ -47,17 +44,12 @@ export function buildTweetView(tweet: FxTweet, videoBuffer?: Buffer | null): Twe
                 new MediaGalleryItemBuilder().setURL(`attachment://${filename}`),
             ),
         );
-    } else {
-        // Photos or video thumbnail fallback
-        const mediaItems = tweet.media?.all;
-        if (mediaItems && mediaItems.length > 0) {
-            const gallery = new MediaGalleryBuilder();
-            for (const item of mediaItems) {
-                const url = item.type === 'video' ? (item.thumbnail_url ?? item.url) : item.url;
-                gallery.addItems(new MediaGalleryItemBuilder().setURL(url));
-            }
-            container.addMediaGalleryComponents(gallery);
-        }
+    } else if (data.cover) {
+        container.addMediaGalleryComponents(
+            new MediaGalleryBuilder().addItems(
+                new MediaGalleryItemBuilder().setURL(data.cover),
+            ),
+        );
     }
 
     // Stats line
@@ -65,17 +57,16 @@ export function buildTweetView(tweet: FxTweet, videoBuffer?: Buffer | null): Twe
         .addSeparatorComponents(createDivider())
         .addTextDisplayComponents(
             createText(
-                `♡ ${formatCompactNumber(tweet.likes)}  🔁 ${formatCompactNumber(tweet.retweets)}  👁 ${formatCompactNumber(tweet.views)}`,
+                `♡ ${formatCompactNumber(data.digg_count)}  💬 ${formatCompactNumber(data.comment_count)}  🔁 ${formatCompactNumber(data.share_count)}  ▶ ${formatCompactNumber(data.play_count)}`,
             ),
         );
 
-    // Action row: link button
     container.addActionRowComponents(
         new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
                 .setStyle(ButtonStyle.Link)
-                .setLabel('🔗 元ツイート')
-                .setURL(tweet.url),
+                .setLabel('🔗 元の動画')
+                .setURL(originalUrl),
         ),
     );
 
