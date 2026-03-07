@@ -134,3 +134,32 @@ model EmbedFixConfig {
 
   @@map("embedfix_configs")
 }
+
+model GuardConfig {
+  guildId        String   @id @map("guild_id")
+  enabled        Boolean  @default(false)
+  inactivityDays Int      @default(30) @map("inactivity_days")
+  trackMessages  Boolean  @default(true) @map("track_messages")
+  trackReactions Boolean  @default(true) @map("track_reactions")
+  trackVoice     Boolean  @default(true) @map("track_voice")
+  logChannelId   String?  @map("log_channel_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("guard_configs")
+}
+
+model MemberActivity {
+  id             Int       @id @default(autoincrement())
+  guildId        String    @map("guild_id")
+  userId         String    @map("user_id")
+  lastMessageAt  DateTime? @map("last_message_at")
+  lastReactionAt DateTime? @map("last_reaction_at")
+  lastVoiceAt    DateTime? @map("last_voice_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@unique([guildId, userId])
+  @@index([guildId])
+  @@map("member_activities")
+}

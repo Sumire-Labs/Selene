@@ -30,5 +30,6 @@ export const SeleneTheme = {
         xp: '経験値設定',
         profile: 'プロフィール',
         levelup: 'レベルアップ',
+        guard: 'ガード',
     },
 } as const;

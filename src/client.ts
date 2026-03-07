@@ -12,6 +12,7 @@ import {handleEmbedFixMessage} from './embedfix/embedfix-listener.js';
 import {handleXpMessage} from './xp/xp-listener.js';
 import {handleVoiceStateForXp, startVoiceXpTicker} from './xp/xp-voice-tracker.js';
 import {wireLoggerEvents} from './settings/logger-listener.js';
+import {handleGuardMessage, handleGuardReaction, handleGuardVoiceState} from './guard/guard-listener.js';
 import {logger} from './utils/logger.js';
 
 const require = createRequire(import.meta.url);
@@ -49,6 +50,7 @@ export function createClient(): Client {
             GatewayIntentBits.MessageContent,
             GatewayIntentBits.GuildMembers,
             GatewayIntentBits.GuildModeration,
+            GatewayIntentBits.GuildMessageReactions,
             GatewayIntentBits.GuildWebhooks,
         ],
     });
@@ -98,6 +100,9 @@ export function createClient(): Client {
     client.on(Events.MessageCreate, handleCounterMessage);
     client.on(Events.MessageCreate, handleEmbedFixMessage);
     client.on(Events.MessageCreate, handleXpMessage);
+    client.on(Events.MessageCreate, handleGuardMessage);
+    client.on(Events.MessageReactionAdd, handleGuardReaction);
+    client.on(Events.VoiceStateUpdate, handleGuardVoiceState);
     client.on(Events.VoiceStateUpdate, handleVoiceStateForXp);
 
     // Start voice XP ticker once ready

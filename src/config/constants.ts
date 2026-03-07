@@ -27,3 +27,9 @@ export const MAX_LOG_CONTENT_LENGTH = 1000;
 // XP
 export const XP_VOICE_TICK_INTERVAL_MS = 60_000;
 export const MAX_XP_ROLE_REWARDS = 25;
+
+// Guard
+export const GUARD_SCAN_PAGE_SIZE = 10;
+export const GUARD_MAX_KICK_BATCH = 100;
+export const GUARD_SCAN_CACHE_TTL_MS = 5 * 60 * 1000;
+export const GUARD_ACTIVITY_THROTTLE_MS = 5 * 60 * 1000;

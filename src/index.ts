@@ -34,6 +34,12 @@ async function loadModules(): Promise<void> {
     await import('./interactions/selects/settings.selects.js');
     await import('./interactions/modals/settings-ticket.modal.js');
     await import('./interactions/modals/settings-xp.modal.js');
+
+    // Guard
+    await import('./commands/general/guard.command.js');
+    await import('./interactions/buttons/guard.buttons.js');
+    await import('./interactions/selects/guard.selects.js');
+    await import('./interactions/modals/guard.modal.js');
 }
 
 async function main(): Promise<void> {
