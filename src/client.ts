@@ -6,7 +6,7 @@ import {config} from './config/index.js';
 import {deployCommands} from './commands/registry.js';
 import {handleInteraction} from './interactions/handler.js';
 import {wirePlayerEvents} from './music/player-events.js';
-import {musicManager} from './music/music-manager.js';
+import {wireVoiceIdleDetector} from './music/voice-idle-detector.js';
 import {handleCounterMessage} from './counter/counter-listener.js';
 import {handleEmbedFixMessage} from './embedfix/embedfix-listener.js';
 import {handleXpMessage} from './xp/xp-listener.js';
@@ -106,30 +106,7 @@ export function createClient(): Client {
     });
 
     // VC empty detection: auto-disconnect after timeout
-    client.on(Events.VoiceStateUpdate, (oldState, _newState) => {
-        const guildId = oldState.guild.id;
-        const guildPlayer = musicManager.get(guildId);
-        if (!guildPlayer) return;
-
-        const botVoiceChannelId = guildPlayer.player.voiceId;
-        if (!botVoiceChannelId) return;
-
-        const voiceChannel = oldState.guild.channels.cache.get(botVoiceChannelId);
-        if (!voiceChannel?.isVoiceBased()) return;
-
-        // Check if only the bot remains in the channel
-        const members = voiceChannel.members.filter(m => !m.user.bot);
-        if (members.size === 0) {
-            logger.info('VC empty, starting disconnect timer', {guildId});
-            guildPlayer.startIdleTimeout(async () => {
-                logger.info('VC empty timeout, destroying player', {guildId});
-                await guildPlayer.player.destroy();
-                await musicManager.destroy(guildId);
-            });
-        } else {
-            guildPlayer.clearIdleTimeout();
-        }
-    });
+    wireVoiceIdleDetector(client);
 
     return client;
 }
